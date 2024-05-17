@@ -322,7 +322,7 @@ export default function Dashboard() {
               </Label>
               <Textarea
                 id="message"
-                placeholder="Type your message here..."
+                placeholder="Type your question about the content here..."
                 className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
