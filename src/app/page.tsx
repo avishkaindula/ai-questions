@@ -289,7 +289,7 @@ export default function Dashboard() {
                   <Textarea
                     id="content"
                     placeholder="Please add your content here..."
-                    className="min-h-[44rem]"
+                    className="min-h-[40rem]"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                   />
@@ -308,7 +308,7 @@ export default function Dashboard() {
                   disabled
                   value={output}
                   className="w-full p-6 rounded-lg"
-                  style={{ height: "600px" }}
+                  style={{ height: "520px" }}
                 ></textarea>
               )}
             </div>
