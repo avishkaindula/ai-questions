@@ -318,7 +318,7 @@ export default function Dashboard() {
               x-chunk="dashboard-03-chunk-1"
             >
               <Label htmlFor="message" className="sr-only">
-                Message
+                Question
               </Label>
               <Textarea
                 id="message"
@@ -352,7 +352,7 @@ export default function Dashboard() {
                 </TooltipProvider>
 
                 <Button type="submit" size="sm" className="ml-auto gap-1.5">
-                  Send Message
+                  Ask Question
                   <CornerDownLeft className="size-3.5" />
                 </Button>
               </div>
