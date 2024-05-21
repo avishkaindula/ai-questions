@@ -48,33 +48,50 @@ import { useTheme } from "next-themes";
 export default function Dashboard() {
   const { setTheme } = useTheme();
   const [content, setContent] = useState("");
-  const [message, setMessage] = useState("");
-  const [output, setOutput] = useState("");
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [validationResult, setValidationResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault();
-
-    console.log("content", content);
-    console.log("message", message);
+  const generateQuestion = async () => {
     setLoading(true);
-
     const prompt = `
+    Based on the following content, generate a question:
     ${content}
-    I need you to refer the above content and answer the following question:
-    ${message}
     `;
 
     try {
-      setMessage("");
-      const response = await axios.post("/api/generate-content", {
-        prompt,
-      });
-
-      setOutput(response.data.message.content);
+      const response = await axios.post("/api/generate-content", { prompt });
+      setQuestion(response.data.message.content);
     } catch (error) {
-      console.error("Error sending message:", error);
-      setOutput("An error occurred while sending the message.");
+      console.error("Error generating question:", error);
+      setQuestion("An error occurred while generating the question.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateAnswer = async () => {
+    setLoading(true);
+    const prompt = `
+    Based on the following content, validate if the answer to the question is correct or not:
+    Content: ${content}
+    Question: ${question}
+    Answer: ${answer}
+    please only output true or false as the output.`;
+
+    try {
+      const response = await axios.post("/api/generate-content", { prompt });
+      const result = response.data.message.content.toLowerCase();
+      if (result.includes("true")) {
+        alert("The answer is correct!");
+      } else {
+        alert("The answer is wrong!");
+      }
+      setValidationResult(result);
+    } catch (error) {
+      console.error("Error validating answer:", error);
+      alert("An error occurred while validating the answer.");
     } finally {
       setLoading(false);
     }
@@ -244,6 +261,9 @@ export default function Dashboard() {
                       onChange={(e) => setContent(e.target.value)}
                     />
                   </div>
+                  <Button onClick={generateQuestion} disabled={loading}>
+                    Generate Question
+                  </Button>
                 </fieldset>
               </form>
             </DrawerContent>
@@ -294,69 +314,39 @@ export default function Dashboard() {
                     onChange={(e) => setContent(e.target.value)}
                   />
                 </div>
+                <Button onClick={generateQuestion} disabled={loading}>
+                  Generate Question
+                </Button>
               </fieldset>
             </form>
           </div>
           <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-2">
             <div className="flex-1 overflow-auto">
-              {loading ? (
-                <div className="flex h-full items-center justify-center">
-                  <span>Loading...</span>
-                </div>
-              ) : (
-                <textarea
-                  disabled
-                  value={output}
-                  className="w-full p-6 rounded-lg"
-                  style={{ height: "520px" }}
-                ></textarea>
-              )}
-            </div>
-            <form
-              onSubmit={handleSubmit}
-              className="relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
-              x-chunk="dashboard-03-chunk-1"
-            >
-              <Label htmlFor="message" className="sr-only">
-                Question
-              </Label>
-              <Textarea
-                id="message"
-                placeholder="Type your question about the content here..."
-                className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-              <div className="flex items-center p-3 pt-0">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Paperclip className="size-4" />
-                        <span className="sr-only">Attach file</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Attach File</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Mic className="size-4" />
-                        <span className="sr-only">Use Microphone</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Use Microphone</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <Button type="submit" size="sm" className="ml-auto gap-1.5">
-                  Ask Question
-                  <CornerDownLeft className="size-3.5" />
+              <div>
+                <p className="ml-1">{question}</p>
+                <Textarea
+                  placeholder="Type your answer here..."
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  className="mt-4 ml-1"
+                  style={{ width: "98%" }}
+                />
+                <Button
+                  onClick={validateAnswer}
+                  disabled={loading}
+                  className="mt-4 ml-1"
+                >
+                  Validate Answer
                 </Button>
+                {loading ? (
+                  <div className="flex h-full items-center justify-center">
+                    <span>Loading...</span>
+                  </div>
+                ) : (
+                  <></>
+                )}
               </div>
-            </form>
+            </div>
           </div>
         </main>
       </div>
